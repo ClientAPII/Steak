@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice 🎲</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: brown;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 80px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .dice {
+            font-size: 40px;
+            margin: 20px 0;
+            transition: transform 0.5s ease;
+        }
+
+        .dice.animate {
+            transform: rotateY(360deg);
+        }
+
+        #output {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        .money {
+            font-size: 18px;
+            color: green;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1><a style="color: white;" class="logo" href="index.html">Steak.com 🥩</a></h1>
+    </div>
+
+    <div class="container">
+        <h1>Dice 🎲</h1>
+        <h2 class="money">Dein Geld: <span id="money">100</span>€</h2>
+
+        <div class="input-group">
+            <label for="betNumber">Wähle eine Zahl (1-6):</label>
+            <input type="number" id="betNumber" min="1" max="6" value="1">
+        </div>
+        
+        <button onclick="startGame()">Würfeln</button>
+        <div id="output"></div>
+        <div class="dice" id="dice">🎲</div>
+    </div>
+
+    <script>
+        // Initialize money from localStorage or default to 100
+        let money = localStorage.getItem('money') ? parseInt(localStorage.getItem('money')) : 100;
+        document.getElementById('money').textContent = money;
+
+        function startGame() {
+            const betNumber = parseInt(document.getElementById("betNumber").value);
+            if (betNumber < 1 || betNumber > 6) {
+                alert("Bitte wähle eine Zahl zwischen 1 und 6.");
+                return;
+            }
+
+            rollDice(betNumber);
+        }
+
+        function rollDice(betNumber) {
+            const dice = document.getElementById("dice");
+            const output = document.getElementById("output");
+
+            // Animate the dice roll
+            dice.classList.add("animate");
+
+            setTimeout(() => {
+                dice.classList.remove("animate");
+
+                const result = Math.floor(Math.random() * 6) + 1;
+                dice.innerText = result;
+
+                if (result === betNumber) {
+                    money *= 2;
+                    output.innerHTML = `🎉 Du hast gewonnen! Die Zahl war ${result}. Dein Geld verdoppelt sich auf: ${money}€`;
+                } else {
+                    money = Math.max(0, money - 10);
+                    output.innerHTML = `😞 Leider verloren! Die Zahl war ${result}. Dein Geld: ${money}€`;
+                }
+
+                // Update money display and localStorage
+                document.getElementById("money").textContent = money;
+                localStorage.setItem('money', money);
+            }, 1000); // Delay for animation effect
+        }
+    </script>
+</body>
+</html>

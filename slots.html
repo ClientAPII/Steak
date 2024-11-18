@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slots 🎰</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 150px; /* Platz für den Header */
+            position: relative;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: brown;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .logo {
+            font-size: 32px; /* Adjust font size as needed */
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            text-decoration: none;
+            color: #ffffff; /* Ändere die Farbe nach Bedarf */
+        }
+
+        .slot {
+            width: 50px;
+            height: 50px;
+            border: 1px solid black;
+            display: inline-block;
+            text-align: center;
+            line-height: 50px;
+            font-size: 24px;
+            margin: 10px;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .spin-animation {
+            animation: spin 1.5s ease-in-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+
+        .money {
+            font-size: 24px;
+            color: green;
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .won {
+            color: red !important;
+        }
+
+        .free-spins {
+            font-size: 18px;
+            color: blue;
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><a style="color: white;" class="logo" href="index.html">Steak.com 🥩</a></h1>
+</div>
+
+<div class="container">
+    <div id="slot1" class="slot">-</div>
+    <div id="slot2" class="slot">-</div>
+    <div id="slot3" class="slot">-</div>
+    <button id="spin">Spin</button>
+    <p id="result"></p> <!-- Add a paragraph element for displaying the result -->
+</div>
+<div class="money" id="money">Geld: $100</div>
+<div class="free-spins" id="freeSpins">Freispiele: 0</div>
+
+<script>
+    var money = localStorage.getItem('money') ? parseInt(localStorage.getItem('money')) : 100;
+    var wonOnce = false;
+    var freeSpins = 0;
+
+    function startSpinAnimation(slot) {
+        return setInterval(function() {
+            var random = Math.floor(Math.random() * 3) + 1;
+            slot.textContent = random;
+        }, 100);
+    }
+
+    function updateMoneyDisplay() {
+        document.getElementById('money').textContent = 'Geld: $' + money;
+    }
+
+    document.getElementById('spin').addEventListener('click', function() {
+        if (freeSpins > 0) {
+            freeSpins--;
+            document.getElementById('freeSpins').textContent = 'Freispiele: ' + freeSpins;
+        } else if (money >= 10) {
+            money -= 10;
+            updateMoneyDisplay();
+            localStorage.setItem('money', money);
+        } else {
+            return;
+        }
+
+        document.getElementById('spin').disabled = true;
+
+        var slots = [document.getElementById('slot1'), document.getElementById('slot2'), document.getElementById('slot3')];
+        var animations = slots.map(startSpinAnimation);
+
+        setTimeout(function() {
+            animations.forEach(clearInterval);
+
+            var slot1 = Math.floor(Math.random() * 3) + 1;
+            var slot2 = Math.floor(Math.random() * 3) + 1;
+            var slot3 = Math.floor(Math.random() * 3) + 1;
+            slots[0].textContent = slot1;
+            slots[1].textContent = slot2;
+            slots[2].textContent = slot3;
+
+            if (slot1 === slot2 && slot2 === slot3) {
+                document.getElementById('result').textContent = 'Du hast gewonnen!';
+                money += 50;
+                updateMoneyDisplay();
+                document.getElementById('money').classList.add('won');
+                wonOnce = true;
+                freeSpins = 2;
+                document.getElementById('freeSpins').textContent = 'Freispiele: ' + freeSpins;
+                localStorage.setItem('money', money);
+            } else {
+                document.getElementById('result').textContent = '';
+                document.getElementById('money').classList.remove('won');
+            }
+
+            document.getElementById('spin').disabled = false;
+        }, 1500);
+    });
+
+    window.onload = function() {
+        updateMoneyDisplay();
+    }
+</script>
+</body>
+</html>

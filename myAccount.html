@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 80px; /* Platz für den Header */
+        }
+
+        h1 {
+            margin-bottom: 0px;
+            color: brown;
+            margin-left: 0px;
+            
+        }
+
+        h2 {
+            margin-bottom: 0px;
+            color: green;
+            margin-left: 0px;
+        
+        }
+
+        h3 {
+            margin-bottom: 0px;
+            
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .logo {
+    font-size: 32px; /* Adjust font size as needed */
+    color: crimson;
+    text-decoration: none;
+}
+
+        .logo:hover {
+            text-decoration: none;
+            color: #ffffff; /* Ändere die Farbe nach Bedarf */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1><a style="color: white;" class="logo" href="index.html">Steak.com 🥩</a></h1>
+    </div>
+    <div>
+        <h1 >Wilkommen, <span id="username"></span>!</h1>
+        <br>
+        <h2 id="money"></h2>
+        <br>
+        <div id="moneyInputContainer" style="display: none;">
+            <label for="moneyInput">Geld ändern:</label>
+            <input type="number" id="moneyInput" name="moneyInput">
+            <button id="updateMoney">Aktualisieren</button>
+        </div>
+        <button id="logout" style="display: none; background-color: brown; color: antiquewhite;">Abmelden</button>
+        <a id="registerLink" style="color: rgb(0, 0, 0); display: none;" href="Account.html">Registrieren</a>
+
+    </div>
+    
+    <br>
+    
+    <script>
+        var username = localStorage.getItem('username');
+        document.getElementById('username').textContent = username;
+        if (username) {
+            var money = localStorage.getItem('money');
+            document.getElementById('money').textContent = 'Geld: ' + money;
+            document.getElementById('logout').style.display = 'block';
+            document.getElementById('moneyInputContainer').style.display = 'block';
+            document.getElementById('moneyInput').value = money;
+        } else {
+            document.getElementById('registerLink').style.display = 'block';
+        }
+        document.getElementById('logout').addEventListener('click', function() {
+            localStorage.removeItem('username');
+            location.reload();
+        });
+        document.getElementById('updateMoney').addEventListener('click', function() {
+            var newMoney = document.getElementById('moneyInput').value;
+            if (newMoney < 0) {
+                alert('Geld kann nicht weniger als 0 sein');
+                return;
+            }
+            localStorage.setItem('money', newMoney);
+            document.getElementById('money').textContent = 'Geld: ' + newMoney;
+        });
+    </script>
+    
+    </body>
+    <footer>
+        
+    </footer>
+    </html>

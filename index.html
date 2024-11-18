@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steak.com 🥩</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            animation: slideInLeft 1s ease-out;
+        }
+
+        /* Navigation Menu Styles */
+        .menu {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            right: 0;
+            background-color: #222;
+            overflow-x: hidden;
+            transition: width 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            padding-top: 60px;
+        }
+
+        .menu a {
+            padding: 15px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #fff;
+            display: block;
+            transition: background-color 0.3s ease;
+            animation: slideInRight 0.5s ease forwards;
+        }
+
+        .menu a:hover {
+            background-color: #444;
+        }
+
+        /* Menu Button Styles */
+        .menuButton {
+            font-size: 30px;
+            cursor: pointer;
+            color: #fff;
+            display: block;
+            margin-right: 20px;
+            z-index: 1002;
+            transition: transform 0.3s ease;
+        }
+
+        .menuButton:hover {
+            transform: scale(1.1);
+        }
+
+        /* Game Styles */
+        .games-container {
+            padding-top: 80px;
+            padding-right: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            transition: padding-right 0.5s ease;
+            gap: 20px;
+        }
+
+        .game {
+            margin: 10px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 200px;
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .game a {
+            color: #333;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .game:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animations */
+        @keyframes slideInLeft {
+            0% {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            0% {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Media Queries */
+        @media(max-width: 768px) {
+            .menuButton {
+                display: block;
+            }
+
+            .menu {
+                padding-top: 80px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .menu a {
+                font-size: 16px;
+            }
+
+            .games-container {
+                padding-top: 120px;
+            }
+
+            .game {
+                width: calc(50% - 20px);
+            }
+        }
+
+        @media(max-width: 480px) {
+            .game {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Steak.com 🥩</h1>
+    <span class="menuButton" onclick="toggleNav()">&#9776;</span>
+</div>
+
+<div id="myMenu" class="menu">
+    <a href="about.html">About</a>
+    <a href="howto.html">How to</a>
+    <a href="contact.html">Contact</a>
+    <a href="motivation.html">Motivation</a>
+    <a href="myAccount.html">Mein Account</a>
+</div>
+
+<div class="games-container">
+    <div class="game">
+        <a href="blackjack.html">Blackjack 🃏</a>
+    </div>
+    <div class="game">
+        <a href="roulette.html">Roulette 💶</a>
+    </div>
+    <div class="game">
+        <a href="slots.html">Slots 🎰</a>
+    </div>
+    <div class="game">
+        <a href="poker.html">Poker 🂡</a>
+    </div>
+    <div class="game">
+        <a href="rockpaperscissors.html">Rock Paper Scissors 🪨📃✂️</a>
+    </div>
+    <div class="game">
+        <a href="stock.html">Aktienkurs 📈</a>
+    </div>
+    <div class="game">
+        <a href="dice.html">Dice 🎲</a>
+    </div>
+</div>
+
+<script>
+    function toggleNav() {
+        var menu = document.getElementById("myMenu");
+        var gamesContainer = document.querySelector(".games-container");
+        if (menu.style.width === "250px") {
+            menu.style.width = "0";
+            gamesContainer.style.paddingRight = "0";
+        } else {
+            menu.style.width = "250px";
+            gamesContainer.style.paddingRight = "250px";
+        }
+    }
+
+    document.addEventListener('click', function(event) {
+        var menu = document.getElementById('myMenu');
+        var menuButton = document.querySelector('.menuButton');
+        if (event.target.closest('#myMenu') === null && event.target !== menuButton && menu.style.width !== "0px") {
+            menu.style.width = "0";
+            document.querySelector(".games-container").style.paddingRight = "0";
+        }
+    });
+</script>
+</body>
+</html>

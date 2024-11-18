@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Game</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 80px; /* Platz für den Header */
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: brown;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        .logo {
+    font-size: 32px; /* Adjust font size as needed */
+    color: crimson;
+    text-decoration: none;
+}
+
+        .logo:hover {
+            text-decoration: none;
+            color: #ffffff; /* Ändere die Farbe nach Bedarf */
+        }
+    </style>
+    <!-- Chart.js für die Kursgrafik -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1><a style="color: white;" class="logo" href="index.html">Steak.com 🥩</a></h1>
+    </div>
+
+    <div class="container">
+        <h1>Aktienkurs-Simulation</h1>
+        <label for="betAmount">Einsatz (in €):</label>
+        <input type="number" id="betAmount" min="1" max="1000" value="100">
+        <button id="startButton">Starten</button>
+        
+        <p><strong>Verfügbares Geld:</strong> <span id="moneyDisplay">1000</span> €</p>
+        
+        <canvas id="stockChart" width="400" height="200" style="display:none;"></canvas>
+        <p><strong>Aktueller Kurs:</strong> <span id="currentPrice">100</span> €</p>
+        
+        <button id="sellButton" style="display:none;">Verkaufen</button>
+        <p id="statusMessage"></p>
+    </div>
+
+    <script>
+        let money = localStorage.getItem('money') ? parseFloat(localStorage.getItem('money')) : 1000;
+        let betAmount = 0;
+        let currentPrice = 100;
+        let interval;
+        let crashed = false;
+        let gameStarted = false;
+
+        document.getElementById('moneyDisplay').innerText = money.toFixed(2);
+
+        const ctx = document.getElementById('stockChart').getContext('2d');
+        const stockChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(50).fill(''), 
+                datasets: [{
+                    label: 'Aktienkurs',
+                    data: Array(50).fill(100),
+                    borderColor: 'crimson',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    x: { display: false },
+                    y: { min: 0 }
+                },
+                animation: false
+            }
+        });
+
+        function updateMoney(amount) {
+            money += amount;
+            document.getElementById('moneyDisplay').innerText = money.toFixed(2);
+            localStorage.setItem('money', money.toFixed(2));
+        }
+
+        function updateStockPrice() {
+            if (crashed) return;
+
+            const change = Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10;
+            currentPrice = Math.max(0, currentPrice + change);
+            document.getElementById('currentPrice').innerText = currentPrice.toFixed(2);
+
+            if (currentPrice < 20) {
+                crashed = true;
+                clearInterval(interval);
+                document.getElementById('statusMessage').innerText = "Der Kurs ist gecrasht! Du hast alles verloren.";
+            }
+
+            stockChart.data.datasets[0].data.push(currentPrice);
+            stockChart.data.datasets[0].data.shift();
+            stockChart.update();
+        }
+
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (gameStarted) return;
+            betAmount = parseFloat(document.getElementById('betAmount').value);
+            if (betAmount <= 0 || betAmount > money) {
+                alert("Ungültiger Einsatz. Bitte wähle einen Betrag zwischen 1 und deinem verfügbaren Geld.");
+                return;
+            }
+
+            updateMoney(-betAmount);
+            document.getElementById('stockChart').style.display = 'block';
+            document.getElementById('sellButton').style.display = 'inline-block';
+            document.getElementById('startButton').style.display = 'none';
+            document.getElementById('statusMessage').innerText = "";
+
+            gameStarted = true;
+            crashed = false;
+            currentPrice = 100;
+            stockChart.data.datasets[0].data = Array(50).fill(currentPrice);
+            interval = setInterval(updateStockPrice, 500);
+        });
+
+        document.getElementById('sellButton').addEventListener('click', () => {
+            if (crashed || !gameStarted) return;
+
+            clearInterval(interval);
+            const profit = betAmount * (currentPrice / 100);
+            updateMoney(profit);
+            document.getElementById('statusMessage').innerText = `Verkauf bei ${currentPrice.toFixed(2)} €! Du hast ${profit.toFixed(2)} € gewonnen.`;
+            
+            gameStarted = false;
+            document.getElementById('sellButton').style.display = 'none';
+            document.getElementById('startButton').style.display = 'inline-block';
+        });
+    </script>
+</body>
+</html>

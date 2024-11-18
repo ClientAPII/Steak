@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poker 🂡</title>
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .header {
+            background-color: #222;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 80px; /* Platz für den Header */
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: brown;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .logo {
+            font-size: 32px; /* Adjust font size as needed */
+            color: crimson;
+            text-decoration: none;
+        }
+
+        .logo:hover {
+            text-decoration: none;
+            color: #ffffff; /* Ändere die Farbe nach Bedarf */
+        }
+
+        .hidden-card {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><a style="color: white;" class="logo" href="index.html">Steak.com 🥩</a></h1>
+</div>
+
+<div class="container">
+    <h2>Texas Hold'em Poker 🂡</h2>
+    <h3>Your money: <span id="money">100</span></h3>
+    <label for="bet">Bet:</label>
+    <input type="number" id="bet" min="1" max="100" value="10">
+    <button onclick="startGame()">Place Bet</button>
+    <div id="player-options" style="display:none;"></div>
+    <br>
+    <button onclick="playerChecks()">Check</button>
+    <button onclick="playerBets()">Bet</button>
+    <button onclick="playerFolds()">Fold</button>
+    <button onclick="playerCalls()">Call</button>
+    <button onclick="playerRaises()">Raise</button>
+    <p id="game-result"></p>
+</div>
+
+<script>
+    var money = localStorage.getItem('money') ? parseInt(localStorage.getItem('money')) : 100;
+    document.getElementById('money').textContent = money;
+    var bet;
+    var playerHand = [];
+    var communityCards = [];
+    var opponentHand = [];
+    var playerFolded = false;
+    var opponentFolded = false;
+    var gameFinished = false;
+    var dealerBet = 0;
+    var pot = 0;
+
+    function playDealerTurn() {
+        if (gameFinished) return;
+
+        var decision = Math.random(); // Generate a random number between 0 and 1
+
+        if (money <= 0) {
+            // If the dealer has no money left, he must fold
+            dealerFolds();
+        } else if (decision < 0.2) {
+            // 20% chance the dealer checks
+            dealerChecks();
+        } else if (decision < 0.6) {
+            // 40% chance the dealer calls
+            dealerCalls();
+        } else if (decision < 0.9) {
+            // 30% chance the dealer raises
+            dealerRaises();
+        } else {
+            // 10% chance the dealer folds
+            dealerFolds();
+        }
+    }
+
+    function startGame() {
+        bet = parseInt(document.getElementById("bet").value);
+        if (bet > money) {
+            alert("You don't have enough money to place that bet!");
+            return;
+        }
+
+        money -= bet;
+        updateMoney(-bet);
+        playerHand = [getRandomCard(), getRandomCard()];
+        communityCards = [getRandomCard(), getRandomCard(), getRandomCard()];
+        opponentHand = [getRandomCard(), getRandomCard()];
+        playerFolded = false;
+        opponentFolded = false;
+        gameFinished = false;
+        dealerBet = 0;
+        pot = bet * 2; // Initial pot is the sum of player and dealer bets
+        updateGameState();
+        document.getElementById("player-options").style.display = "block";
+        playDealerTurn(); // Start dealer's turn
+    }
+    function updateMoney(amount) {
+        money += amount;
+        document.getElementById('money').textContent = money;
+        localStorage.setItem('money', money);
+    }
+
+    function updateGameState() {
+        var playerHandString = "Your Hand: " + formatHand(playerHand) + "<br>";
+        var communityCardsString = "Community Cards: " + formatHand(communityCards) + "<br>";
+        var opponentHandString = "";
+        var resultString = "";
+
+        if (playerFolded || opponentFolded) {
+            gameFinished = true;
+            opponentHandString = "Opponent's Hand: " + formatHand(opponentHand) + "<br>"; // Show opponent's hand only when game is finished
+            if (playerFolded && opponentFolded) {
+                resultString = "Both players folded. It's a tie.";
+                money += pot;
+            } else if (playerFolded) {
+                resultString = "You folded. Opponent wins!";
+            } else {
+                resultString = "Opponent folded. You win!";
+                money += pot;
+            }
+        } else {
+            resultString = "Game in progress...";
+        }
+
+        document.getElementById("game-result").innerHTML = playerHandString + communityCardsString + opponentHandString + resultString;
+        document.getElementById("money").textContent = money;
+    }
+
+    function playerChecks() {
+        if (gameFinished) return;
+
+        // Player checks; no action needed
+        alert("You have checked. Waiting for dealer's action.");
+        updateGameState();
+    }
+
+    function playerBets() {
+        if (gameFinished) return;
+
+        var betAmount = parseInt(prompt("How much would you like to bet?", "0"));
+        if (isNaN(betAmount) || betAmount <= 0) {
+            alert("Invalid bet amount. Please enter a positive number.");
+            return;
+        }
+        if (betAmount > money) {
+            alert("You don't have enough money to bet that amount.");
+            return;
+        }
+        money -= betAmount;
+        pot += betAmount;
+        dealerBet = betAmount; // Dealer's bet is set to the player's bet
+        updateGameState();
+    }
+
+    function playerFolds() {
+        if (gameFinished) return;
+
+        playerFolded = true;
+        alert("You have folded. Dealer wins the round.");
+        updateGameState();
+    }
+
+    function playerCalls() {
+        if (gameFinished) return;
+
+        var callAmount = dealerBet; // Assuming dealerBet is the current bet amount by the dealer
+        if (callAmount > money) {
+            alert("You don't have enough money to call.");
+            return;
+        }
+        money -= callAmount;
+        pot += callAmount;
+        updateGameState();
+    }
+
+    function playerRaises() {
+        if (gameFinished) return;
+
+        var raiseAmount = parseInt(prompt("How much would you like to raise?", "0"));
+        if (isNaN(raiseAmount) || raiseAmount <= 0) {
+            alert("Invalid raise amount. Please enter a positive number.");
+            return;
+        }
+        if (raiseAmount > money) {
+            alert("You don't have enough money to raise that amount.");
+            return;
+        }
+        money -= raiseAmount;
+        pot += raiseAmount;
+        dealerBet = raiseAmount; // Update the current bet amount by the dealer
+        updateGameState();
+    }
+
+    
+    
+    function dealerFolds() {
+        if (gameFinished) return;
+
+        dealerFolded = true;
+        alert("Dealer has folded. You win the round.");
+        currentPlayer = 'player'; // Switch turn to player
+        updateGameState();
+    }
+
+    function dealerChecks() {
+        if (gameFinished) return;
+
+        // Dealer checks; no action needed
+        alert("Dealer has checked. Your turn.");
+        currentPlayer = 'player'; // Switch turn to player
+        updateGameState();
+    }
+
+    function dealerCalls() {
+        if (gameFinished) return;
+
+        var callAmount = playerBet; // Assuming playerBet is the current bet amount by the player
+        if (callAmount > dealerMoney) {
+            alert("Dealer doesn't have enough money to call. Dealer folds.");
+            dealerFolds();
+            return;
+        }
+        dealerMoney -= callAmount;
+        pot += callAmount;
+        currentPlayer = 'player'; // Switch turn to player
+        updateGameState();
+    }
+
+    function dealerRaises() {
+        if (gameFinished) return;
+
+        var raiseAmount = Math.floor(Math.random() * dealerMoney) + 1; // Dealer raises a random amount
+        if (raiseAmount > dealerMoney) {
+            alert("Dealer doesn't have enough money to raise. Dealer folds.");
+            dealerFolds();
+            return;
+        }
+        dealerMoney -= raiseAmount;
+        pot += raiseAmount;
+        playerBet = raiseAmount; // Update the current bet amount by the player
+        currentPlayer = 'player'; // Switch turn to player
+        updateGameState();
+    }
+
+    function getRandomCard() {
+        var cards = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        var suits = ['♠️', '♥️', '♦️', '♣️'];
+        var cardValue = cards[Math.floor(Math.random() * cards.length)];
+        var cardSuit = suits[Math.floor(Math.random() * suits.length)];
+        return { value: cardValue, suit: cardSuit };
+    }
+
+    function formatHand(hand) {
+        return hand.map(card => card.value + card.suit).join(", ");
+    }
+
+    var money = localStorage.getItem('money') ? parseInt(localStorage.getItem('money')) : 100;
+    document.getElementById('money').textContent = money;
+
+    function updateMoney(amount) {
+        money += amount;
+        document.getElementById('money').textContent = money;
+        localStorage.setItem('money', money);
+    }
+</script>
+
+</body>
+</html>
