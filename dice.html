@@ -41,7 +41,7 @@
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 32px;
             color: crimson;
             text-decoration: none;
         }
@@ -62,23 +62,6 @@
             color: brown;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        input[type="number"] {
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 80px;
-        }
-
         button {
             padding: 10px 20px;
             border: none;
@@ -86,32 +69,21 @@
             background-color: #333;
             color: #fff;
             cursor: pointer;
-            margin-top: 10px;
+            margin: 5px;
         }
 
         button:hover {
             background-color: #555;
         }
 
-        .dice {
-            font-size: 40px;
-            margin: 20px 0;
-            transition: transform 0.5s ease;
-        }
-
-        .dice.animate {
-            transform: rotateY(360deg);
-        }
-
-        #output {
-            font-size: 18px;
+        p {
             margin-top: 20px;
+            font-size: 18px;
         }
 
-        .money {
-            font-size: 18px;
-            color: green;
-            margin-top: 15px;
+        .logo:hover {
+            text-decoration: none;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -122,59 +94,27 @@
     </div>
 
     <div class="container">
-        <h1>Dice 🎲</h1>
-        <h2 class="money">Dein Geld: <span id="money">100</span>€</h2>
-
-        <div class="input-group">
-            <label for="betNumber">Wähle eine Zahl (1-6):</label>
-            <input type="number" id="betNumber" min="1" max="6" value="1">
-        </div>
-        
-        <button onclick="startGame()">Würfeln</button>
+        <h1>Craps</h1>
+        <button onclick="rollDice()">Würfeln</button>
         <div id="output"></div>
-        <div class="dice" id="dice">🎲</div>
     </div>
 
     <script>
-        // Initialize money from localStorage or default to 100
-        let money = localStorage.getItem('money') ? parseInt(localStorage.getItem('money')) : 100;
-        document.getElementById('money').textContent = money;
+        function rollDice() {
+            var die1 = Math.floor(Math.random() * 6) + 1;
+            var die2 = Math.floor(Math.random() * 6) + 1;
+            var total = die1 + die2;
+            var output = "Würfel 1: " + die1 + "<br>Würfel 2: " + die2 + "<br>Gesamt: " + total;
 
-        function startGame() {
-            const betNumber = parseInt(document.getElementById("betNumber").value);
-            if (betNumber < 1 || betNumber > 6) {
-                alert("Bitte wähle eine Zahl zwischen 1 und 6.");
-                return;
+            document.getElementById("output").innerHTML = output;
+
+            if (total === 7 || total === 11) {
+                document.getElementById("output").innerHTML += "<br>Der Shooter hat gewonnen!";
+            } else if (total === 2 || total === 3 || total === 12) {
+                document.getElementById("output").innerHTML += "<br>Der Shooter hat verloren!";
+            } else {
+                document.getElementById("output").innerHTML += "<br>Der Shooter muss noch einmal würfeln.";
             }
-
-            rollDice(betNumber);
-        }
-
-        function rollDice(betNumber) {
-            const dice = document.getElementById("dice");
-            const output = document.getElementById("output");
-
-            // Animate the dice roll
-            dice.classList.add("animate");
-
-            setTimeout(() => {
-                dice.classList.remove("animate");
-
-                const result = Math.floor(Math.random() * 6) + 1;
-                dice.innerText = result;
-
-                if (result === betNumber) {
-                    money *= 2;
-                    output.innerHTML = `🎉 Du hast gewonnen! Die Zahl war ${result}. Dein Geld verdoppelt sich auf: ${money}€`;
-                } else {
-                    money = Math.max(0, money - 10);
-                    output.innerHTML = `😞 Leider verloren! Die Zahl war ${result}. Dein Geld: ${money}€`;
-                }
-
-                // Update money display and localStorage
-                document.getElementById("money").textContent = money;
-                localStorage.setItem('money', money);
-            }, 1000); // Delay for animation effect
         }
     </script>
 </body>

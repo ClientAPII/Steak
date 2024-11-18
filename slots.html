@@ -172,7 +172,7 @@
     <div id="slot2" class="slot">-</div>
     <div id="slot3" class="slot">-</div>
     <button id="spin">Spin</button>
-    <p id="result"></p> <!-- Add a paragraph element for displaying the result -->
+    <p id="result"></p> <!-- Anzeige für das Ergebnis -->
 </div>
 <div class="money" id="money">Geld: $100</div>
 <div class="free-spins" id="freeSpins">Freispiele: 0</div>
@@ -181,6 +181,7 @@
     var money = localStorage.getItem('money') ? parseInt(localStorage.getItem('money')) : 100;
     var wonOnce = false;
     var freeSpins = 0;
+    var spinSound;
 
     function startSpinAnimation(slot) {
         return setInterval(function() {
@@ -194,6 +195,15 @@
     }
 
     document.getElementById('spin').addEventListener('click', function() {
+        // Audio-Element programmatisch erzeugen
+        spinSound = new Audio('bookofrah.mp3');
+        spinSound.loop = true;
+        spinSound.currentTime = 0;
+
+        spinSound.play().catch(error => {
+            console.error("Audio konnte nicht abgespielt werden:", error);
+        });
+
         if (freeSpins > 0) {
             freeSpins--;
             document.getElementById('freeSpins').textContent = 'Freispiele: ' + freeSpins;
